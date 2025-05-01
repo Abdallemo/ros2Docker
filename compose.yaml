@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  ros2:
+    image: robot:latest
+    container_name: ros2
+    volumes:
+      - .:/home
+    working_dir: /home
+    environment:
+      - DISPLAY=host.docker.internal:0.0
+    stdin_open: true
+    tty: true
+    command: bash && pwd && colcon build
+    
