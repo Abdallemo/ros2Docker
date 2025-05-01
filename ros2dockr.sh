@@ -41,8 +41,12 @@ fi
 case "$1" in
   -clean)
     echo "♻️  Rebuilding and cleaning volumes"
+    if docker ps -a --format '{{.Names}}' | grep -q '^ros2$'; then
+      echo "🧹 Removing old container 'ros2'"
+      docker rm -f ros2
+    fi
     xhost +local:root
-    docker-compose down -v
+    docker-compose down 
     docker-compose up --build -d
     ;;
   -start)
