@@ -92,7 +92,6 @@ chmod +x ros2dock.sh
 - [`compose.yaml`](https://github.com/Abdallemo/ros2Docker/blob/main/compose.yaml)
 - [`Dockerfile`](https://github.com/Abdallemo/ros2Docker/blob/main/Dockerfile)
 - [`ros2dock.sh`](https://github.com/Abdallemo/ros2Docker/blob/main/ros2dock.sh)
-- [`ros2dockr.bat`](https://github.com/Abdallemo/ros2Docker/blob/main/ros2dockr.bat)
 - [`ros2dock.ps1`](https://github.com/Abdallemo/ros2Docker/blob/main/ros2dock.ps1)
 - [`.env`](https://github.com/Abdallemo/ros2Docker/blob/main/.env)
 
