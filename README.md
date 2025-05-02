@@ -5,11 +5,11 @@ A simple cross-platform Docker Compose tool to streamline building and running R
 # Installation
 ## for Linux/Mac run this command
 ``` bash
-curl -sSL https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/install.sh | bash
 ```
 ## for Windows run this command
 ```bash
-iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/install.ps1 | iex
+iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/install.ps1 | iex
 
 ```
 
