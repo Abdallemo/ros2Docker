@@ -11,7 +11,10 @@ for file in "${required_files[@]}"; do
     echo "✅ Found: $file"
   else
     echo "❌ Missing: $file"
-    exit 1
+    echo "⬇️ Downloading $file"
+    # as you know i want to download it in the userProject
+    curl -L -o $file https://raw.githubusercontent.com/Abdallemo/ros2Docker/refs/heads/main/$file
+    
   fi
 done
 
@@ -70,4 +73,3 @@ case "$1" in
     echo "ℹ️ Usage: $0 {-clean|-start|-stop|-shell|-logs}"
     ;;
 esac
-
