@@ -11,7 +11,7 @@ $shortcutPath = Join-Path $confDir "ros2docker.cmd"
 New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 New-Item -ItemType Directory -Force -Path $confDir | Out-Null
 
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Abdallemo/ros2Docker/main/src/ros2dockr" -OutFile $targetPath
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Abdallemo/ros2Docker/main/src/ros2dockr.ps1" -OutFile $targetPath
 
 
 Set-Content -Path $shortcutPath -Value "@echo off`nPowerShell -ExecutionPolicy Bypass -File `"$targetPath`" %*"
