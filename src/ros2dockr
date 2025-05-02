@@ -3,7 +3,7 @@
 set -e
 export PWD="$(pwd)"
 source /etc/os-release
-
+baseUrl="https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/src"
 docDir="$HOME/.ros2docker"
 mkdir -p "$docDir"
 
@@ -17,7 +17,7 @@ for file in "${required_files[@]}"; do
     echo "❌ Missing: $file"
 
     echo "⬇ Downloading $file to $docDir"
-    curl -L -o "$docDir/$file" "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/$file"
+    curl -L -o "$docDir/$file" "$baseUrl/$file"
 
   fi
 done
