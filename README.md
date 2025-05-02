@@ -54,19 +54,19 @@ From your terminal:
 ### 🐧 Linux/macOS (Bash)
 ```bash
 chmod +x ros2dock.sh
-./ros2dock.sh -start      # Start the container
-./ros2dock.sh -clean      # Clean, rebuild and restart
-./ros2dock.sh -stop       # Stop and remove containers
-./ros2dock.sh -shell      # Open container shell
-./ros2dock.sh -logs       # View logs
+./ros2dockr.sh -clean      # Clean, rebuild and restart
+./ros2dockr.sh -start      # Start the container
+./ros2dockr.sh -stop       # Stop and remove containers
+./ros2dockr.sh -shell      # Open container shell
+./ros2dockr.sh -logs       # View logs
 ```
 ### 🪟 Windows PowerShell
 ```
-.\ros2dock.ps1 -start
-.\ros2dock.ps1 -clean
-.\ros2dock.ps1 -stop
-.\ros2dock.ps1 -shell
-.\ros2dock.ps1 -logs
+.\ros2dockr.ps1 -start
+.\ros2dockr.ps1 -clean
+.\ros2dockr.ps1 -stop
+.\ros2dockr.ps1 -shell
+.\ros2dockr.ps1 -logs
 
 ```
 
