@@ -5,7 +5,8 @@ services:
     image: robot:latest
     container_name: ros2
     volumes:
-      - .:/home
+      #- .:/home
+      - ${PWD}:/home
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY}:${XAUTHORITY}
     working_dir: /home

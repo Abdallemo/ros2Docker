@@ -22,5 +22,8 @@ if (-not ($env:PATH -split ";" | Where-Object { $_ -eq $confDir })) {
     [Environment]::SetEnvironmentVariable("Path", "$currentPath;$confDir", "User")
 }
 
+[Environment]::SetEnvironmentVariable("DISPLAY", "host.docker.internal:0.0", "User")
+[Environment]::SetEnvironmentVariable("XAUTHORITY", "/tmp/.docker.xauth", "User")
+
 Write-Host "✅ ros2docker installed successfully!"
 Write-Host "🔄 Restart your shell or log out/in to use 'ros2docker'"
