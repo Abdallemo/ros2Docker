@@ -1,11 +1,22 @@
 
 $requiredFiles = @("compose.yaml", "Dockerfile", ".env")
+$baseUrl = "https://raw.githubusercontent.com/Abdallemo/ros2Docker/main"
 Write-Host "📂 Checking for required files..."
 foreach ($file in $requiredFiles) {
-    if (Test-Path $file) { Write-Host "✅ Found: $file" }
-    else { Write-Host "❌ Missing: $file"; exit 1 }
+    if (Test-Path $file) {
+        Write-Host "✅ Found: $file"
+    } else {
+        Write-Host "❌ Missing: $file"
+        Write-Host "⬇️  Downloading $file..."
+        try {
+            Invoke-WebRequest -Uri "$baseUrl/$file" -OutFile $file -UseBasicParsing
+            Write-Host "✅ Downloaded: $file"
+        } catch {
+            Write-Error "❌ Failed to download $file"
+            exit 1
+        }
+    }
 }
-
 $Command = $args[0]
 
 switch ($Command) {
