@@ -29,23 +29,11 @@ Make sure you have:
 
 ---
 
-## 🖥️ Host Display Setup via `.env`
+~~## 🖥️ Host Display Setup via `.env`~~
 
-The `.env` file determines how graphical output (GUI apps) is forwarded from the container to the host. 
+~~The `.env` file determines how graphical output (GUI apps) is forwarded from the container to the host.~~
 
-```dotenv
-# For Windows users with VcXsrv
-DISPLAY=host.docker.internal:0.0
 
-# For Linux X11 users
-DISPLAY=:0
-
-# For Wayland (experimental)
-#WAYLAND_DISPLAY=wayland-1
-
-# Used to authorize X11 connection inside the container dont comment it 📛
-XAUTHORITY=/tmp/.docker.xauth
-```
 
 ## 🚀 Usage
 
@@ -54,11 +42,12 @@ From your terminal:
 ### 🐧 Linux/macOS (Bash)
 ```bash
 chmod +x ros2dock.sh
-./ros2dockr.sh -clean      # Clean, rebuild and restart
-./ros2dockr.sh -start      # Start the container
-./ros2dockr.sh -stop       # Stop and remove containers
-./ros2dockr.sh -shell      # Open container shell
-./ros2dockr.sh -logs       # View logs
+ros2dockr -clean      # Clean, rebuild and restart
+ros2dockr -start      # Start the container
+ros2dockr -stop       # Stop and remove containers
+ros2dockr -shell      # Open container shell
+ros2dockr -logs       # View logs
+ros2dockr -h          # for manual
 ```
 ### 🪟 Windows PowerShell
 ```
@@ -89,11 +78,11 @@ chmod +x ros2dock.sh
 
 ## 📎 Related Files
 
-- [`compose.yaml`](https://github.com/Abdallemo/ros2Docker/blob/main/compose.yaml)
-- [`Dockerfile`](https://github.com/Abdallemo/ros2Docker/blob/main/Dockerfile)
-- [`ros2dock.sh`](https://github.com/Abdallemo/ros2Docker/blob/main/ros2dock.sh)
-- [`ros2dock.ps1`](https://github.com/Abdallemo/ros2Docker/blob/main/ros2dock.ps1)
-- [`.env`](https://github.com/Abdallemo/ros2Docker/blob/main/.env)
+- [`compose.yaml`](https://github.com/xaatim/ROS2-Docker-Launcher/compose.yaml)
+- [`Dockerfile`](https://github.com/xaatim/ROS2-Docker-Launcher/Dockerfile)
+- [`ros2dock.sh`](https://github.com/xaatim/ROS2-Docker-Launcher/ros2dock.sh)
+- [`ros2dock.ps1`](https://github.com/xaatim/ROS2-Docker-Launcher/ros2dock.ps1)
+~~[`.env`](https://github.com/Abdallemo/ros2Docker/blob/main/.env)~~
 
 ---
 
