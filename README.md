@@ -2,9 +2,16 @@
 
 A simple cross-platform Docker Compose tool to streamline building and running ROS2 environments with graphical support on **Linux** and **Windows**.
 
-This utility provides a consistent interface via:
-- `ros2dock.ps1` for **PowerShell**
-- `ros2dock.sh` for **Linux/macOS Bash**
+# Installation
+## for Linux/Mac run this command
+``` bash
+curl -sSL https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/install.sh | bash
+```
+## for Windows run this command
+```bash
+iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/install.sh | iex
+
+```
 
 ---
 
