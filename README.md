@@ -9,7 +9,7 @@ curl -sSL https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/hea
 ```
 ## for Windows run this command
 ```bash
-iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/install.sh | iex
+iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/install.ps1 | iex
 
 ```
 
