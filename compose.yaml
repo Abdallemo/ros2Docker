@@ -1,15 +1,19 @@
-version: "3.8"
-
+version: '3'
 services:
   ros2:
+    build: .
     image: robot:latest
     container_name: ros2
     volumes:
       - .:/home
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY}:${XAUTHORITY}
     working_dir: /home
     environment:
-      - DISPLAY=host.docker.internal:0.0
+      - DISPLAY=${DISPLAY}            # this is for X11 or XWayland
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}  # this is for Wayland sessions
+      - QT_QPA_PLATFORM=xcb           # Explicitly tell Qt to use XCB
     stdin_open: true
     tty: true
     command: bash && pwd && colcon build
-    
+
