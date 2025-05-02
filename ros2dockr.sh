@@ -15,8 +15,10 @@ for file in "${required_files[@]}"; do
     echo "✅ Found: $file"
   else
     echo "❌ Missing: $file"
+
     echo "⬇ Downloading $file to $docDir"
     curl -L -o "$docDir/$file" "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/ros2dockr/$file"
+
   fi
 done
 
