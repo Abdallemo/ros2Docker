@@ -1,16 +1,18 @@
-
-$requiredFiles = @("compose.yaml", "Dockerfile", ".env")
+$requiredFiles = @("compose.yaml", "Dockerfile")
 $baseUrl = "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main"
+$docDir = "$env:USERPROFILE\.ros2docker"
+New-Item -ItemType Directory -Force -Path $docDir | Out-Null
+
 Write-Host "📂 Checking for required files..."
 foreach ($file in $requiredFiles) {
-    if (Test-Path $file) {
+    if (Test-Path "$docDir\$file") {
         Write-Host "✅ Found: $file"
     }
     else {
         Write-Host "❌ Missing: $file"
         Write-Host "⬇️  Downloading $file..."
         try {
-            Invoke-WebRequest -Uri "$baseUrl/$file" -OutFile $file -UseBasicParsing
+            Invoke-WebRequest -Uri "$baseUrl/$file" -OutFile "$docDir\$file" -UseBasicParsing
             Write-Host "✅ Downloaded: $file"
         }
         catch {
@@ -19,6 +21,7 @@ foreach ($file in $requiredFiles) {
         }
     }
 }
+
 $Command = $args[0]
 
 switch ($Command) {
@@ -28,16 +31,16 @@ switch ($Command) {
             Write-Host "🧹 Removing old container 'ros2'"
             docker rm -f ros2
         }
-        docker compose down
-        docker compose up --build -d
+        docker compose -f "$docDir\compose.yaml" down
+        docker compose -f "$docDir\compose.yaml" up --build -d
     }
     "-start" {
         Write-Host "🚀 Starting (without rebuild)"
-        docker compose up -d
+        docker compose -f "$docDir\compose.yaml" up -d
     }
     "-stop" {
         Write-Host "🛑 Stopping services"
-        docker compose down
+        docker compose -f "$docDir\compose.yaml" down
     }
     "-shell" {
         Write-Host "🔧 Entering container shell"
@@ -45,7 +48,7 @@ switch ($Command) {
     }
     "-logs" {
         Write-Host "📜 Streaming logs"
-        docker compose logs -f
+        docker compose -f "$docDir\compose.yaml" logs -f
     }
     { $_ -eq "-h" -or $_ -eq "--help" } {
         Write-Host "🛠 ros2dock.ps1 usage:"
