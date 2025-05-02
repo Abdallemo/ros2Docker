@@ -22,13 +22,22 @@ if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
     */zsh)
         echo "⚙️  Detected Zsh"
         echo "export PATH=\"\$PATH:$BIN_DIR\"" >>"$HOME/.zshrc"
+        echo "export DISPLAY=:0" >>"$HOME/.zshrc"
+        echo "export WAYLAND_DISPLAY=wayland-1" >>"$HOME/.zshrc"
+        echo "export XAUTHORITY=/tmp/.docker.xauth" >>"$HOME/.zshrc"
         ;;
     */bash)
         echo "⚙️  Detected Bash"
         echo "export PATH=\"\$PATH:$BIN_DIR\"" >>"$HOME/.bashrc"
+        echo "export DISPLAY=:0" >>"$HOME/.bashrc"
+        echo "export WAYLAND_DISPLAY=wayland-1" >>"$HOME/.bashrc"
+        echo "export XAUTHORITY=/tmp/.docker.xauth" >>"$HOME/.bashrc"
         ;;
     *)
         echo "⚠️  Unknown shell. Please add $BIN_DIR to your PATH manually."
+        echo "export DISPLAY=:0" >>"$HOME/.profile"
+        echo "export WAYLAND_DISPLAY=wayland-1" >>"$HOME/.profile"
+        echo "export XAUTHORITY=/tmp/.docker.xauth" >>"$HOME/.profile"
         ;;
     esac
 

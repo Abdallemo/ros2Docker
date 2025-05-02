@@ -5,13 +5,15 @@ Write-Host "📂 Checking for required files..."
 foreach ($file in $requiredFiles) {
     if (Test-Path $file) {
         Write-Host "✅ Found: $file"
-    } else {
+    }
+    else {
         Write-Host "❌ Missing: $file"
         Write-Host "⬇️  Downloading $file..."
         try {
             Invoke-WebRequest -Uri "$baseUrl/$file" -OutFile $file -UseBasicParsing
             Write-Host "✅ Downloaded: $file"
-        } catch {
+        }
+        catch {
             Write-Error "❌ Failed to download $file"
             exit 1
         }
@@ -45,7 +47,16 @@ switch ($Command) {
         Write-Host "📜 Streaming logs"
         docker compose logs -f
     }
+    { $_ -eq "-h" -or $_ -eq "--help" } {
+        Write-Host "🛠 ros2dock.ps1 usage:"
+        Write-Host "  -clean     🔄 Rebuild image and restart container"
+        Write-Host "  -start     🚀 Start container (without rebuild)"
+        Write-Host "  -stop      🛑 Stop and remove container"
+        Write-Host "  -shell     🔧 Enter interactive container shell"
+        Write-Host "  -logs      📜 Follow container logs"
+        Write-Host "  -h|--help  🆘 Show this help message"
+    }
     default {
-        Write-Host "ℹ️ Usage: ./ros2dock.ps1 [-clean|-start|-stop|-shell|-logs]"
+        Write-Host "ℹ️ Usage: ./ros2dock.ps1 [-help | -h]"
     }
 }
