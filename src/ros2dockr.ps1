@@ -1,5 +1,5 @@
 $requiredFiles = @("compose.yaml", "Dockerfile")
-$baseUrl = "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/src"
+$baseUrl = "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/src"
 $docDir = "$env:USERPROFILE\.ros2docker"
 New-Item -ItemType Directory -Force -Path $docDir | Out-Null
 $env:PWD = Get-Location

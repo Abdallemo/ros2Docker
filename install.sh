@@ -7,9 +7,9 @@ echo "📥 Downloading ros2docker script..."
 INSTALL_DIR="$HOME/.ros2docker"
 BIN_DIR="$HOME/.local/bin"
 EXECUTABLE_NAME="ros2dockr"
-
+baseUrl="https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/src"
 mkdir -p "$INSTALL_DIR"
-curl -L -o "$INSTALL_DIR/$EXECUTABLE_NAME" "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/src/ros2dockr"
+curl -L -o "$INSTALL_DIR/$EXECUTABLE_NAME" "$baseUrl/$EXECUTABLE_NAME"
 chmod +x "$INSTALL_DIR/$EXECUTABLE_NAME"
 
 mkdir -p "$BIN_DIR"

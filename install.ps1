@@ -7,14 +7,12 @@ $confDir = "$env:USERPROFILE\.config"
 $executableName = "ros2dockr.ps1"
 $targetPath = Join-Path $installDir $executableName
 $shortcutPath = Join-Path $confDir "ros2docker.cmd"
+$baseUrl = "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/src"
 
 New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 New-Item -ItemType Directory -Force -Path $confDir | Out-Null
 
-
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/src/ros2dockr.ps1" -OutFile $targetPath
-
-
+Invoke-WebRequest -Uri "$baseUrl/$executableName " -OutFile $targetPath
 
 Set-Content -Path $shortcutPath -Value "@echo off`nPowerShell -ExecutionPolicy Bypass -File `"$targetPath`" %*"
 
