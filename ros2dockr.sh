@@ -13,7 +13,8 @@ for file in "${required_files[@]}"; do
     echo "❌ Missing: $file"
     echo "⬇️ Downloading $file"
     # as you know i want to download it in the userProject
-    curl -L -o $file https://raw.githubusercontent.com/Abdallemo/ros2Docker/refs/heads/main/$file
+    curl -L -o $file https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/refs/heads/main/ros2dockr$file
+    
     
   fi
 done
