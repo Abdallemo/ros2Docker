@@ -2,30 +2,72 @@
 
 source /etc/os-release
 
-dependencies=("docker" "curl")
-dependencies_download_dir="/usr/bin"
-download_url1=
+dependencies=("curl" "docker")
+curl_download_dir="/usr/bin"
+docker_download_dir=/var/lib
+
+
 # 📂 Check for dependencies
 echo "📂 Checking for dependencies..."
 
-
-if [ -f /etc/os-release ]; then
-  source /etc/os-release
-  os_name-b= echo "Operating System: $PRETTY_NAME"
-elif [ -f /etc/lsb-release ]; then
-  source /etc/lsb-release
-  os_name-a= echo "Operating System: $(lsb_release -a | grep Description | awk '{print $2, $3, $4, $5}')"
+if [[ "$ID_LIKE" =~ (ubuntu|debian) || "$ID" =~ (ubuntu|debian) ]]; then
+    os="ubuntu"
+elif [[ "$ID_LIKE" =~ (arch) || "$ID" =~ (arch) ]]; then
+    os="arch"
+    sh_pkg="sudo pacman -S --noconfirm"
+    d_pkg="yay -S --noconfirm"
 else
-  echo "Could not determine the operating system."
+    os="unknown"
 fi
 
-
 for file in "${dependencies[@]}"; do
+  
   if [[ -f "/usr/bin/$file" ]]; then
     echo "✅ Found: $file"
   else
     echo "❌ Missing: $file"
-    echo "⬇ Downloading $file to $dependencies_download_dir"
-    if operatings
+
+    if [ $file == 'curl' ];then
+      echo "⬇ Downloading $file to $curl_download_dir"
+
+        if [ $os == "arch" ]; then
+          sudo pacman -Syu
+          sudo pacman -S --noconfirm curl
+        elif [ $os == 'ubuntu' ]; then 
+          sudo apt-get update
+          sudo apt-get install ca-certificates curl
+        fi
+    else
+
+      echo "⬇ Downloading $file to $docker_download_dir"
+
+      if [ $os = 'ubuntu' ]; then
+
+        for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+        sudo apt-get install ca-certificates curl
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+        # Add the repository to Apt sources:
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+      
+      elif [ $os == 'arch' ]; then
+        yay -Syu
+        sudo pacman -S docker --noconfirm
+        sudo systemctl enable docker.service
+        sudo systemctl start docker.service
+
+        yay -S docker-compose --noconfirm
+      fi
+    fi
   fi
-done
+  done
+
+
