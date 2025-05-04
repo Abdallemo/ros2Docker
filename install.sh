@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-#source dependencies_install.sh
 echo "📥 Downloading ros2docker script..."
 
 INSTALL_DIR="$HOME/.ros2docker"
