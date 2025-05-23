@@ -26,4 +26,4 @@ if (-not ($env:PATH -split ";" | Where-Object { $_ -eq $confDir })) {
 [Environment]::SetEnvironmentVariable("XAUTHORITY", "/tmp/.docker.xauth", "User")
 
 Write-Host " [ok] ros2docker installed successfully!"
-Write-Host " [*] Restart your shell or log out/in to use 'ros2docker'"
+Write-Host " [*] Restart your shell or log out/in to use 'ros2dockr'"

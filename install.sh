@@ -45,4 +45,4 @@ fi
 
 echo "✅ ros2docker installed successfully!"
 echo "🔄 Please restart your shell or run 'source ~/.bashrc' to update your PATH."
-echo "💡 Try running: ros2docker -clean"
+echo "💡 Try running: ros2dockr -clean"
