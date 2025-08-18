@@ -11,12 +11,13 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "ros2Docker",
+	Use:   "ros2docker",
 	Short: "ros2docker is a lightweight CLI tool for managing ROS 2 development environments ",
 	Long: `ros2docker is a CLI tool that makes ROS 2 available across platforms 
 without requiring specific Linux distributions or complex setup. 
 It uses Docker under the hood to provide a consistent, portable ROS 2 
-environment that works seamlessly on Linux, macOS, and Windows.`,
+environment that works seamlessly on Linux, macOS, and Windows.
+usa`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -40,5 +41,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 }
