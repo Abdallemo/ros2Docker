@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
@@ -19,6 +20,12 @@ const (
 	Humble = "humble"
 	Foxy   = "foxy"
 )
+
+var execConfig = container.ExecOptions{
+	Cmd:          []string{"bash", "-c", "apt-get update && apt-get install -y git python3-pip"},
+	AttachStdout: true,
+	AttachStderr: true,
+}
 
 type Logger interface {
 	StreamLogs(io.ReadCloser) error
@@ -37,9 +44,14 @@ func (i ImageType) IsValid() bool {
 }
 
 type WorkspaceConfig struct {
+	ID     string    `json:"id"`
 	Name   string    `json:"name"`
 	Image  ImageType `json:"image"`
 	Volume string    `json:"volume"`
+}
+
+func (wcfg *WorkspaceConfig) GetSaveData() (any, string) {
+	return wcfg, fmt.Sprintf("workspace-%s.json", wcfg.Name)
 }
 
 type Docker struct {
@@ -61,8 +73,9 @@ type ImageBuildMessage struct {
 }
 
 // StreamLogs decodes and prints the logs from an image build or pull stream.
-func (msg *ImageBuildMessage) StreamLogs(reader io.ReadCloser) error {
+func StreamLogs(reader io.ReadCloser) error {
 	decoder := json.NewDecoder(reader)
+
 	for {
 		var msg ImageBuildMessage
 		if err := decoder.Decode(&msg); err != nil {
@@ -84,65 +97,56 @@ func (msg *ImageBuildMessage) StreamLogs(reader io.ReadCloser) error {
 // CreateContainer pulls a base image, sets up a temporary container to
 // install dependencies, commits the changes to a new image,
 // and then creates the final container with a mounted volume.
-func (d *Docker) CreateContainer(containerName, volume string, img ImageType) error {
-	m := ImageBuildMessage{}
+func (d *Docker) CreateContainer(containerName, volume string) error {
+	toolsImage := fmt.Sprintf("ros:%s-tools", d.Image)
 	ctx := context.Background()
 
-	if !img.IsValid() {
-		return fmt.Errorf("invalid image type: %s", img)
+	if !d.Image.IsValid() {
+		return fmt.Errorf("invalid image type: %s", d.Image)
 	}
 
-	reader, err := d.Client.ImagePull(ctx, fmt.Sprintf("osrf/ros:%s-desktop", img), image.PullOptions{})
+	reader, err := d.Client.ImagePull(ctx, fmt.Sprintf("osrf/ros:%s-desktop", d.Image), image.PullOptions{})
 	if err != nil {
 		return err
 	}
-	m.StreamLogs(reader)
+	defer reader.Close()
+	StreamLogs(reader)
 
-	tempCont, err := d.Client.ContainerCreate(ctx,
+	_, inspectErr := d.Client.ImageInspect(ctx, toolsImage)
+	if inspectErr == nil {
+		fmt.Println("using Cached Version")
+		finalCont, err := d.setupContainer(ctx, toolsImage, volume, containerName)
+		if err != nil {
+			return err
+		}
+		d.Container.ID = finalCont.ID
+		return nil
+	}
+	if !errdefs.IsNotFound(inspectErr) {
+		return inspectErr
+	}
+
+	commitRespId, err := d.installDependencies(ctx, volume, containerName, toolsImage)
+	if err != nil {
+		return err
+	}
+
+	finalCont, err := d.setupContainer(ctx, commitRespId, volume, containerName)
+	if err != nil {
+		return err
+	}
+
+	d.Container.ID = finalCont.ID
+	return nil
+}
+
+// small helper to setup a container with passed meta data
+func (d *Docker) setupContainer(ctx context.Context, imageId, volume, containerName string) (container.CreateResponse, error) {
+
+	fmt.Printf("ImageId:%s, Volume:%s ,ContaierName:%s\n", imageId, volume, containerName)
+	return d.Client.ContainerCreate(ctx,
 		&container.Config{
-			Image: fmt.Sprintf("osrf/ros:%s-desktop", img),
-			Tty:   true,
-			Cmd:   []string{"bash"},
-		},
-		nil, nil, nil, containerName+"-setup")
-	if err != nil {
-		return err
-	}
-
-	if err := d.Client.ContainerStart(ctx, tempCont.ID, container.StartOptions{}); err != nil {
-		return err
-	}
-
-	execConfig := container.ExecOptions{
-		Cmd:          []string{"bash", "-c", "apt-get update && apt-get install -y git python3-pip"},
-		AttachStdout: true,
-		AttachStderr: true,
-	}
-	execID, err := d.Client.ContainerExecCreate(ctx, tempCont.ID, execConfig)
-	if err != nil {
-		return err
-	}
-	resp, err := d.Client.ContainerExecAttach(ctx, execID.ID, container.ExecAttachOptions{})
-	if err != nil {
-		return err
-	}
-	defer resp.Close()
-	io.Copy(os.Stdout, resp.Reader)
-
-	commitResp, err := d.Client.ContainerCommit(ctx, tempCont.ID, container.CommitOptions{
-		Reference: fmt.Sprintf("ros:%s-tools", img),
-	})
-	if err != nil {
-		return err
-	}
-
-	if err := d.Client.ContainerRemove(ctx, tempCont.ID, container.RemoveOptions{Force: true}); err != nil {
-		return err
-	}
-
-	finalCont, err := d.Client.ContainerCreate(ctx,
-		&container.Config{
-			Image: commitResp.ID,
+			Image: imageId,
 			Tty:   true,
 			Cmd:   []string{"bash"},
 		},
@@ -159,20 +163,56 @@ func (d *Docker) CreateContainer(containerName, volume string, img ImageType) er
 		nil,
 		containerName,
 	)
-	if err != nil {
-		return err
-	}
 
-	d.Container.ID = finalCont.ID
-	return nil
 }
 
 // RemoveContainer stops and removes the Docker container.
-func (d *Docker) RemoveContainer() {}
+func (d *Docker) RemoveContainer(ctx context.Context, containerId string) error {
+	if err := d.Client.ContainerRemove(ctx, containerId, container.RemoveOptions{Force: true}); err != nil {
+		return err
+	}
+	return nil
+
+}
 
 // NewDocker creates a new Docker instance with the provided client
 func NewDocker(client *client.Client) *Docker {
 	return &Docker{
 		Client: client,
 	}
+}
+
+// installDependencies installs exec packages into a temepory container and then commits these
+// changes to a new Custome Image.
+func (d *Docker) installDependencies(ctx context.Context, volume, containerName, toolsImage string) (string, error) {
+	fmt.Println("excuted setup Container in installDependencies")
+	tempCont, err := d.setupContainer(ctx, fmt.Sprintf("osrf/ros:%s-desktop", d.Image), volume, containerName+"-setup")
+	if err != nil {
+		return "", err
+	}
+	if err := d.Client.ContainerStart(ctx, tempCont.ID, container.StartOptions{}); err != nil {
+		return "", err
+	}
+
+	execID, err := d.Client.ContainerExecCreate(ctx, tempCont.ID, execConfig)
+	if err != nil {
+		return "", err
+	}
+	resp, err := d.Client.ContainerExecAttach(ctx, execID.ID, container.ExecAttachOptions{})
+	if err != nil {
+		return "", err
+	}
+	defer resp.Close()
+	io.Copy(os.Stdout, resp.Reader)
+
+	commitResp, err := d.Client.ContainerCommit(ctx, tempCont.ID, container.CommitOptions{
+		Reference: toolsImage,
+	})
+	if err != nil {
+		return "", err
+	}
+	if err := d.RemoveContainer(ctx, tempCont.ID); err != nil {
+		return "", err
+	}
+	return commitResp.ID, nil
 }
