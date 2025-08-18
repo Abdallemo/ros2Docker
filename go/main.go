@@ -19,11 +19,11 @@ func main() {
 		log.Fatal("unable to connect to docker", err)
 	}
 	dckr := docker.NewDocker(cli)
-	_, err = utils.NewConfig("ros2docker")
+	globalCfg, err := utils.NewGlobalConfig("ros2docker")
 	if err != nil {
 		log.Fatal("unable to setup Program Configurations", err)
 	}
 
-	cmd.Execute(dckr)
+	cmd.Execute(dckr, *globalCfg)
 
 }
