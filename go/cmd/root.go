@@ -7,11 +7,15 @@ import (
 	"os"
 
 	"github.com/Abdallemo/ros2Docker/internals/docker"
+	"github.com/Abdallemo/ros2Docker/internals/utils"
 	"github.com/spf13/cobra"
 )
 
 // Docker a global intilized docker struct
-var dockerClient *docker.Docker
+var (
+	dockerClient *docker.Docker
+	globalCfg    utils.GlbalConfig
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -29,8 +33,9 @@ usa`,
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(d *docker.Docker) {
+func Execute(d *docker.Docker, g utils.GlbalConfig) {
 	dockerClient = d
+	globalCfg = g
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
