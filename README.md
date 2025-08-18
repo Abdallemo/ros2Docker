@@ -2,14 +2,29 @@
 
 A simple cross-platform Docker Compose tool to streamline building and running ROS2 environments with graphical support on **Linux** and **Windows**.
 
+# Moved: ROS2 Docker Launcher (Bash Version)
+
+The Bash version of this launcher has been moved to [`bash--deprecated`](./bash--deprecated).  
+For the latest Go-based ROS2 Docker Launcher, see the [ros2Docker](https://github.com/Abdallemo/ros2Docker) project.
+
+
+If you used the previous **ros2Docker launcher**:
+
+- All previous functionality (start, stop, shell, logs, rebuild) is now integrated into a **single Go CLI**.
+- Each workspace now has a **unique container ID and persistent configuration**.
+- Workspaces can be created in **any path**, not just the current directory.
+- Image caching is automatic; containers are only rebuilt if necessary.
+- Container names are now deterministic (optional randomness removed) to avoid collisions.
+- Config files for each workspace are saved in a `workspace` directory, making it easy to reload or inspect workspaces.
+
 # Installation
 ## for Linux/Mac run this command
 ``` bash
-curl -sSL https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/bash--deprecated/install.sh | bash
 ```
 ## for Windows run this command
 ```bash
-iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/install.ps1 | iex
+iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/bash--deprecated/install.ps1 | iex
 
 ```
 
