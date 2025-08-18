@@ -14,6 +14,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
+// These constants represent the supported ROS distribution image types.
 const (
 	Humble = "humble"
 	Foxy   = "foxy"
@@ -25,11 +26,12 @@ type Logger interface {
 
 type ImageType string
 
-type Container struct {
+type DockerContainer struct {
 	ID string `json:"id"`
 }
 
-func (i ImageType) IsVlaid() bool {
+// IsValid checks if the ImageType is one of the supported types.
+func (i ImageType) IsValid() bool {
 	return i == Humble || i == Foxy
 
 }
@@ -42,13 +44,15 @@ type WorkspaceConfig struct {
 
 type Docker struct {
 	Client    *client.Client
-	Container Container
+	Container DockerContainer
 	Image     ImageType
 }
 type ProgressDetails struct {
 	Current int `json:"current"`
 	Total   int `json:"total"`
 }
+
+// ImageBuildMessage represents a single message from the Docker image build stream.
 type ImageBuildMessage struct {
 	ID             string          `json:"id"`
 	Status         string          `json:"status"`
@@ -56,6 +60,7 @@ type ImageBuildMessage struct {
 	Progress       string          `json:"progress"`
 }
 
+// StreamLogs decodes and prints the logs from an image build or pull stream.
 func (msg *ImageBuildMessage) StreamLogs(reader io.ReadCloser) error {
 	decoder := json.NewDecoder(reader)
 	for {
@@ -76,11 +81,14 @@ func (msg *ImageBuildMessage) StreamLogs(reader io.ReadCloser) error {
 	return nil
 }
 
+// CreateContainer pulls a base image, sets up a temporary container to
+// install dependencies, commits the changes to a new image,
+// and then creates the final container with a mounted volume.
 func (d *Docker) CreateContainer(containerName, volume string, img ImageType) error {
-	msg := ImageBuildMessage{}
+	m := ImageBuildMessage{}
 	ctx := context.Background()
 
-	if !img.IsVlaid() {
+	if !img.IsValid() {
 		return fmt.Errorf("invalid image type: %s", img)
 	}
 
@@ -88,7 +96,7 @@ func (d *Docker) CreateContainer(containerName, volume string, img ImageType) er
 	if err != nil {
 		return err
 	}
-	msg.StreamLogs(reader)
+	m.StreamLogs(reader)
 
 	tempCont, err := d.Client.ContainerCreate(ctx,
 		&container.Config{
@@ -159,8 +167,10 @@ func (d *Docker) CreateContainer(containerName, volume string, img ImageType) er
 	return nil
 }
 
+// RemoveContainer stops and removes the Docker container.
 func (d *Docker) RemoveContainer() {}
 
+// NewDocker creates a new Docker instance with the provided client
 func NewDocker(client *client.Client) *Docker {
 	return &Docker{
 		Client: client,
