@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/Abdallemo/ros2Docker/internals/docker"
+	"github.com/Abdallemo/ros2Docker/internals/ui/text"
 	"github.com/Abdallemo/ros2Docker/internals/utils"
 	"github.com/spf13/cobra"
 )
@@ -20,8 +21,10 @@ var newCmd = &cobra.Command{
 	Example: `
 	ros2docker run my_ws --image humble`,
 	Run: func(cmd *cobra.Command, args []string) {
+		log := text.New()
+		log.Run()
 		if len(args) < 1 {
-			fmt.Println("please provide a workspace name")
+			log.Append("please provide a workspace name", text.Error)
 			return
 		}
 		workspaceName := args[0]
@@ -29,20 +32,20 @@ var newCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 		currentDir, err := os.Getwd()
 		if err != nil {
-			fmt.Println("unable to locate the current working direcorty", err)
+			log.Append("unable to locate the current working direcorty", text.Error)
 			return
 		}
 		dockerClient.Image = docker.ImageType(image)
 
 		if ok := dockerClient.Image.IsValid(); !ok {
-			fmt.Printf("unsupported image type: %s", image)
+			log.Append(fmt.Sprintf("unsupported image type: %s", image), text.Error)
 			return
 		}
 		if err := utils.IsValidPath(path); err != nil {
-			fmt.Printf("%s", err.Error())
+			log.Append(fmt.Sprintf("%s", err.Error()), text.Error)
 			return
 		}
-		fmt.Printf("Creating new ros2 workspace: %s with image %s\n", workspaceName, image)
+		log.Append(fmt.Sprintf("Creating new ros2 workspace: %s with image %s\n", workspaceName, image), text.Ok)
 		containerName := utils.GenerateMix(workspaceName)
 
 		var wscfg docker.WorkspaceConfig
