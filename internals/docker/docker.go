@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/Abdallemo/ros2Docker/internals/ui/text"
 	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -72,7 +73,6 @@ type ImageBuildMessage struct {
 	Progress       string          `json:"progress"`
 }
 
-// StreamLogs decodes and prints the logs from an image build or pull stream.
 func StreamLogs(reader io.ReadCloser) error {
 	decoder := json.NewDecoder(reader)
 
@@ -105,17 +105,13 @@ func (d *Docker) CreateContainer(containerName, volume string) error {
 		return fmt.Errorf("invalid image type: %s", d.Image)
 	}
 
-	reader, err := d.Client.ImagePull(ctx, fmt.Sprintf("osrf/ros:%s-desktop", d.Image), image.PullOptions{})
-	if err != nil {
-		return err
-	}
-	defer reader.Close()
-	StreamLogs(reader)
-
 	_, inspectErr := d.Client.ImageInspect(ctx, toolsImage)
 	if inspectErr == nil {
-		fmt.Println("using Cached Version")
+		log := text.New()
+		log.Run()
+		log.Append("using Cached Version", text.Info)
 		finalCont, err := d.setupContainer(ctx, toolsImage, volume, containerName)
+		log.Stop()
 		if err != nil {
 			return err
 		}
@@ -125,6 +121,12 @@ func (d *Docker) CreateContainer(containerName, volume string) error {
 	if !errdefs.IsNotFound(inspectErr) {
 		return inspectErr
 	}
+	reader, err := d.Client.ImagePull(ctx, fmt.Sprintf("osrf/ros:%s-desktop", d.Image), image.PullOptions{})
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+	StreamLogsTui(reader)
 
 	commitRespId, err := d.installDependencies(ctx, volume, containerName, toolsImage)
 	if err != nil {
@@ -137,13 +139,13 @@ func (d *Docker) CreateContainer(containerName, volume string) error {
 	}
 
 	d.Container.ID = finalCont.ID
+
 	return nil
 }
 
 // small helper to setup a container with passed meta data
 func (d *Docker) setupContainer(ctx context.Context, imageId, volume, containerName string) (container.CreateResponse, error) {
 
-	fmt.Printf("ImageId:%s, Volume:%s ,ContaierName:%s\n", imageId, volume, containerName)
 	return d.Client.ContainerCreate(ctx,
 		&container.Config{
 			Image: imageId,
@@ -185,7 +187,7 @@ func NewDocker(client *client.Client) *Docker {
 // installDependencies installs exec packages into a temepory container and then commits these
 // changes to a new Custome Image.
 func (d *Docker) installDependencies(ctx context.Context, volume, containerName, toolsImage string) (string, error) {
-	fmt.Println("excuted setup Container in installDependencies")
+
 	tempCont, err := d.setupContainer(ctx, fmt.Sprintf("osrf/ros:%s-desktop", d.Image), volume, containerName+"-setup")
 	if err != nil {
 		return "", err
@@ -203,8 +205,9 @@ func (d *Docker) installDependencies(ctx context.Context, volume, containerName,
 		return "", err
 	}
 	defer resp.Close()
-	io.Copy(os.Stdout, resp.Reader)
+	io.Copy(os.Stderr, resp.Reader)
 
+	fmt.Println("cleaning up things...")
 	commitResp, err := d.Client.ContainerCommit(ctx, tempCont.ID, container.CommitOptions{
 		Reference: toolsImage,
 	})
@@ -214,5 +217,12 @@ func (d *Docker) installDependencies(ctx context.Context, volume, containerName,
 	if err := d.RemoveContainer(ctx, tempCont.ID); err != nil {
 		return "", err
 	}
+	_, err = d.Client.ImageRemove(ctx, fmt.Sprintf("osrf/ros:%s-desktop", d.Image), image.RemoveOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println("Dependencies installed successfully!")
+
 	return commitResp.ID, nil
 }
