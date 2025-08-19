@@ -29,6 +29,19 @@ func SaveConfig(baseDir string, s Config) error {
 	return nil
 }
 
+func LoadConfigs(baseDir string, g Config) error {
+	row, fileName := g.GetSaveData()
+	fullPath := filepath.Join(baseDir, fileName)
+	b, err := os.ReadFile(fullPath)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(b, row); err != nil {
+		return err
+	}
+	return nil
+}
+
 type GlbalConfig struct {
 	Location string
 	Folder   string
@@ -68,9 +81,6 @@ func NewGlobalConfig(folder string) (*GlbalConfig, error) {
 	}, nil
 }
 
-func LoadConfigs(g Config) error {
-	return nil
-}
 func IsValidPath(path string) error {
 	if path != "" {
 		fpath, err := filepath.Abs(path)
