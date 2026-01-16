@@ -30,7 +30,7 @@ iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/ba
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 
 | File              | Purpose                                      |
 |-------------------|----------------------------------------------|
@@ -42,7 +42,7 @@ iwr -useb  https://raw.githubusercontent.com/xaatim/ROS2-Docker-Launcher/main/ba
 
 ---
 
-## ⚙️ Prerequisites
+##  Prerequisites
 
 Make sure you have:
 
@@ -57,11 +57,11 @@ Make sure you have:
 
 
 
-## 🚀 Usage
+##  Usage
 
 From your terminal:
 
-### 🐧 Linux/macOS (Bash)
+### Linux/macOS (Bash)
 ```bash
 chmod +x ros2dock.sh
 ros2dockr -clean      # Clean, rebuild and restart
@@ -81,7 +81,7 @@ ros2dockr -h          # for manual
 
 ```
 
-## ❓ What Each Command Does
+## What Each Command Does
 | Command     | Description                              |
 |-------------|------------------------------------------|
 | `-start`    | Launch containers without rebuilding      |
@@ -90,7 +90,7 @@ ros2dockr -h          # for manual
 | `-shell`    | Enters the running container shell        |
 | `-logs`     | Shows the live container logs             |
 
-## 💡 Tips
+## Tips
 
 - For **Windows users**, start your X11 server **before** launching the container.
 - If using **Wayland**, ensure your session supports `xhost` or use tools like [XWayland](https://wiki.archlinux.org/title/XWayland).
@@ -98,7 +98,7 @@ ros2dockr -h          # for manual
 
 ---
 
-## 📎 Related Files
+##  Related Files
 
 - [`compose.yaml`](https://github.com/xaatim/ROS2-Docker-Launcher/compose.yaml)
 - [`Dockerfile`](https://github.com/xaatim/ROS2-Docker-Launcher/Dockerfile)
